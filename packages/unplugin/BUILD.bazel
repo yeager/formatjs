@@ -43,9 +43,9 @@ SRC_DEPS = [
     "//:node_modules/vite",
 ]
 
-# Type check only with tsgo (fast, parallel)
 # Uses skipLibCheck because unplugin's .d.ts imports types from many optional peer deps
 ts_project(
+    # Type-check only (tsgo, no emit)
     name = "dist-esm-esnext-typecheck",
     srcs = [":srcs"],
     declaration = True,
@@ -56,8 +56,8 @@ ts_project(
     deps = SRC_DEPS,
 )
 
-# Transpile with oxc-transform (fast JS and .d.ts generation)
 ts_project(
+    # Transpile to JS + .d.ts (oxc-transform)
     name = "dist-esm-esnext",
     srcs = [":srcs"],
     declaration = True,

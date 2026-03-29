@@ -65,6 +65,7 @@ SRC_DEPS = [
 ] + VUE_DEPS + SVELTE_DEPS + GLIMMER_HBS_DEPS
 
 ts_project(
+    # Type-check only (tsgo, no emit)
     name = "dist-esm-esnext-typecheck",
     srcs = [":srcs"],
     declaration = True,
@@ -76,6 +77,7 @@ ts_project(
 )
 
 ts_project(
+    # Transpile to JS + .d.ts (oxc-transform)
     name = "dist-esm-esnext",
     srcs = [":srcs"],
     declaration = True,

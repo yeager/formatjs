@@ -36,6 +36,7 @@ SRC_DEPS = [
 TESTS = glob(["tests/*"])
 
 ts_project(
+    # Type-check only (tsgo, no emit)
     name = "dist-esm-typecheck",
     srcs = [":srcs"],
     declaration = True,
@@ -47,6 +48,7 @@ ts_project(
 )
 
 ts_project(
+    # Transpile to JS + .d.ts (oxc-transform)
     name = "dist-esm",
     srcs = [":srcs"],
     declaration = True,
