@@ -174,7 +174,22 @@ vitest_runner(
 
 This `vitest_runner` macro would contain only the `vitest_bin.vitest_test` call and snapshot update targets — no `ts_project`.
 
-### Phase 4: Leave everything else as-is
+### Phase 4: Enable gazelle with map_kind (**IN PROGRESS**)
+
+Created `tools/formatjs_lib.bzl` with `formatjs_ts_project` macro that wraps the dual typecheck+transpile pattern. Plan:
+
+1. Use `# gazelle:map_kind ts_project formatjs_ts_project //tools:formatjs_lib.bzl` to map gazelle's generated targets to our macro
+2. Use `# gazelle:js_project_naming_convention dist` and `# gazelle:js_tests_naming_convention unit_test` to match our existing target names
+3. Convert all packages to use `formatjs_ts_project` macro
+4. Enable `# gazelle:js enabled` in root BUILD.bazel
+
+**Known issues to resolve:**
+
+- Gazelle replaces `[":srcs"]` (copy_to_bin target) with expanded file lists, which includes test fixtures and scripts that break the transpiler. Fix: either use `# gazelle:js_files` directive to control glob patterns, or update the macro to filter non-source files.
+- `ts_project` auto-generates `_typecheck_test` targets (build_test) that use tsc with file-based tsconfig. For packages needing ESNEXT_TSCONFIG, these fail because the file-based tsconfig inherits ES2017 from root. Fix: add `validate = False` to internal ts_project calls, or update package tsconfig.json files.
+- Need `# gazelle:js disabled` in dirs with naming conflicts: benchmarks, docs, examples, editor, and complex integration-tests.
+
+### Phase 5: Leave everything else as-is
 
 These are packaging/codegen concerns that gazelle shouldn't touch:
 
@@ -182,16 +197,6 @@ These are packaging/codegen concerns that gazelle shouldn't touch:
 - `esbuild` bundles
 - `generate_src_file` codegen targets
 - `generate_ide_tsconfig_json` targets
-- `copy_to_bin` for srcs
-
-## Enabling Gazelle After Migration
-
-Once `ts_project` targets are visible in BUILD files:
-
-1. In root `BUILD.bazel`, change `# gazelle:js disabled` to `# gazelle:js enabled`
-2. Run `bazel run //:gazelle -- -mode diff` to preview changes
-3. Enable per-package incrementally with `# gazelle:js enabled` in individual BUILD files
-4. Gazelle will keep `ts_project` deps in sync with actual TypeScript imports
 
 ## TSConfig Strategy
 
