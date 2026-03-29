@@ -8,7 +8,7 @@ load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:index.bzl", "generate_ide_tsconfig_json")
 load("//tools:oxc_transpiler.bzl", "oxc_transpiler")
 load("//tools:tsconfig.bzl", "ESNEXT_SKIP_LIB_CHECK_TSCONFIG")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "vitest_runner")
 
 npm_link_all_packages()
 
@@ -76,13 +76,43 @@ js_library(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "unit_test_typecheck",
+    testonly = True,
+    srcs = SRCS + glob(["tests/**/*.ts"]),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = SRC_DEPS + [d for d in VITEST_DEPS if d not in SRC_DEPS],
+)
+
+vitest_runner(
     name = "unit_test",
     srcs = SRCS + glob(["tests/**/*.ts"]),
     deps = SRC_DEPS,
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "conformance_test_typecheck",
+    testonly = True,
+    srcs = SRCS + [
+        ":rust_cli_copy",
+    ] + glob(["conformance-tests/**/*.ts"]),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = SRC_DEPS + [
+        "//:node_modules/@bazel/runfiles",
+    ] + [d for d in VITEST_DEPS if d not in SRC_DEPS],
+)
+
+vitest_runner(
     name = "conformance_test",
     srcs = SRCS + [
         ":rust_cli_copy",

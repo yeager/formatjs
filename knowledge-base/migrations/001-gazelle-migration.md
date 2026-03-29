@@ -139,9 +139,11 @@ Do the same for `ts_compile_node` but with `ESNEXT_TSCONFIG`.
 
 **Packages to update:** ~30 library packages under `packages/`
 
-### Phase 3: Decompose `vitest` test macro
+### Phase 3: Decompose `vitest` test macro (**DONE**)
 
 **Effort:** Medium | **Risk:** Medium
+
+Created `vitest_runner` macro in `tools/vitest.bzl` (test runner + snapshots, no type-checking). Inlined `ts_project` typecheck into all 40 vitest call sites across 34 BUILD files. Exported `TEST_TSCONFIG`, `VITEST_DEPS`, `VITEST_DOM_DEPS` from vitest.bzl for use in BUILD files.
 
 Split into:
 

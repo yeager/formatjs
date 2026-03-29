@@ -10,7 +10,7 @@ load("@npm//:tsd/package_json.bzl", tsd_bin = "bin")
 load("//tools:index.bzl", "generate_ide_tsconfig_json")
 load("//tools:oxc_transpiler.bzl", "oxc_transpiler")
 load("//tools:tsconfig.bzl", "BASE_TSCONFIG")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "VITEST_DOM_DEPS", "vitest_runner")
 
 npm_link_all_packages()
 
@@ -111,7 +111,21 @@ genrule(
     cmd = "cat $< | sed -E 's/__require\\(\"react\"\\)/window.React/g' > $@",
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "unit_test_typecheck",
+    testonly = True,
+    srcs = SRCS +
+           TESTS,
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = TEST_DEPS + [d for d in VITEST_DEPS if d not in TEST_DEPS] + VITEST_DOM_DEPS,
+)
+
+vitest_runner(
     name = "unit_test",
     srcs = SRCS +
            TESTS,
