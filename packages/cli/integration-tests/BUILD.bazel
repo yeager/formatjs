@@ -1,6 +1,8 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@npm//:@typescript/native-preview/package_json.bzl", tsgo_bin = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "vitest_runner")
 
 npm_link_all_packages()
 
@@ -48,7 +50,27 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "compile_folder_integration_test_typecheck",
+    testonly = True,
+    srcs = glob(
+        ["compile_folder/*.test.ts"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = [
+        ":node_modules/@formatjs/cli",
+        "//:node_modules/@types/fs-extra",
+        "//:node_modules/fast-glob",
+        "//:node_modules/fs-extra",
+    ] + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "compile_folder_integration_test",
     srcs = glob(
         ["compile_folder/*.test.ts"],
@@ -96,7 +118,28 @@ vitest(
 #     deps = ["//:node_modules/@bazel/runfiles"],
 # )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "extract_vue_integration_test_typecheck",
+    testonly = True,
+    srcs = glob(
+        ["extract-vue/*.test.ts"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = [
+        ":node_modules/@formatjs/cli",
+        "//:node_modules/@babel/types",
+        "//:node_modules/@vue/compiler-core",
+        "//:node_modules/fast-glob",
+        "//:node_modules/vue",
+    ] + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "extract_vue_integration_test",
     srcs = glob(
         ["extract-vue/*.test.ts"],
@@ -114,7 +157,26 @@ vitest(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "extract_glimmer_integration_test_typecheck",
+    testonly = True,
+    srcs = glob(
+        ["extract-glimmer/*.test.ts"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = [
+        ":node_modules/@formatjs/cli",
+        "//:node_modules/@babel/types",
+        "//:node_modules/fast-glob",
+    ] + GLIMMER_HBS_DEPS + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "extract_glimmer_integration_test",
     srcs = glob(
         ["extract-glimmer/*.test.ts"],
@@ -130,7 +192,27 @@ vitest(
     ] + GLIMMER_HBS_DEPS,
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "compile_integration_test_typecheck",
+    testonly = True,
+    srcs = [
+        "formatter.js",
+        "rust-binary-utils.ts",
+        ":node_modules/@formatjs/cli",
+        ":rust_cli_copy",
+    ] + glob(
+        ["compile/**/*"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = ["//:node_modules/@bazel/runfiles"] + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "compile_integration_test",
     srcs = [
         "formatter.js",
@@ -146,7 +228,28 @@ vitest(
     deps = ["//:node_modules/@bazel/runfiles"],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "verify_integration_test_typecheck",
+    testonly = True,
+    srcs = [
+        "rust-binary-utils.ts",
+        ":rust_cli_copy",
+    ] + glob(
+        ["verify/*.test.ts"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = [
+        ":node_modules/@formatjs/cli",
+        "//:node_modules/@bazel/runfiles",
+    ] + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "verify_integration_test",
     srcs = [
         "rust-binary-utils.ts",
@@ -170,7 +273,30 @@ vitest(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "conformance_test_typecheck",
+    testonly = True,
+    srcs = [
+        "rust-binary-utils.ts",
+        ":node_modules/@formatjs/cli",
+        ":rust_cli_copy",
+    ] + glob(
+        ["conformance-tests/*.test.ts"],
+    ),
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = [
+        "//:node_modules/@bazel/runfiles",
+        "//:node_modules/@types/fs-extra",
+        "//:node_modules/fs-extra",
+    ] + VITEST_DEPS,
+)
+
+vitest_runner(
     name = "conformance_test",
     srcs = [
         "rust-binary-utils.ts",

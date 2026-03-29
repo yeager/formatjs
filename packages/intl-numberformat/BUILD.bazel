@@ -12,7 +12,7 @@ load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//tools:index.bzl", "generate_ide_tsconfig_json", "generate_src_file", "ts_run_binary")
 load("//tools:oxc_transpiler.bzl", "oxc_transpiler")
 load("//tools:tsconfig.bzl", "BASE_TSCONFIG")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "vitest_runner")
 
 npm_link_all_packages()
 
@@ -218,7 +218,23 @@ multirun(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "misc_tests_typecheck",
+    testonly = True,
+    srcs = glob([
+               "tests/*.test.ts",
+           ]) + [":srcs"] +
+           TEST_LOCALE_DATA,
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = TEST_DEPS + [d for d in VITEST_DEPS if d not in TEST_DEPS],
+)
+
+vitest_runner(
     name = "misc_tests",
     size = "large",
     srcs = glob([
@@ -229,18 +245,38 @@ vitest(
 )
 
 [
-    vitest(
-        name = "%s_tests" % type,
-        size = "large",
-        srcs = [
-            "tests/%s/%s.generated.test.ts" % (type, locale)
-            for locale in UNIT_TEST_LOCALES
-        ] + [
-            ":srcs",
-            "tests/%s/%sTest.ts" % (type, type),
-        ] + TEST_LOCALE_DATA,
-        deps = TEST_DEPS,
-    )
+    [
+        ts_project(
+            # Type-check only (tsgo, no emit)
+            name = "%s_tests_typecheck" % type,
+            testonly = True,
+            srcs = [
+                "tests/%s/%s.generated.test.ts" % (type, locale)
+                for locale in UNIT_TEST_LOCALES
+            ] + [
+                ":srcs",
+                "tests/%s/%sTest.ts" % (type, type),
+            ] + TEST_LOCALE_DATA,
+            declaration = True,
+            no_emit = True,
+            resolve_json_module = True,
+            transpiler = tsgo_bin.tsgo,
+            tsconfig = TEST_TSCONFIG,
+            deps = TEST_DEPS + [d for d in VITEST_DEPS if d not in TEST_DEPS],
+        ),
+        vitest_runner(
+            name = "%s_tests" % type,
+            size = "large",
+            srcs = [
+                "tests/%s/%s.generated.test.ts" % (type, locale)
+                for locale in UNIT_TEST_LOCALES
+            ] + [
+                ":srcs",
+                "tests/%s/%sTest.ts" % (type, type),
+            ] + TEST_LOCALE_DATA,
+            deps = TEST_DEPS,
+        ),
+    ]
     for type in LOCALE_TEST_TYPES
 ]
 

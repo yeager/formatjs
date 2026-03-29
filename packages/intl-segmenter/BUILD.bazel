@@ -11,7 +11,7 @@ load("@npm//:test262-harness/package_json.bzl", test262_harness_bin = "bin")
 load("//tools:index.bzl", "generate_ide_tsconfig_json", "generate_src_file")
 load("//tools:oxc_transpiler.bzl", "oxc_transpiler")
 load("//tools:tsconfig.bzl", "BASE_TSCONFIG")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "vitest_runner")
 load(":index.bzl", "unicode_file_name")
 
 npm_link_all_packages()
@@ -97,7 +97,20 @@ js_library(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "unit_test_typecheck",
+    testonly = True,
+    srcs = SRCS + TESTS + ["tests/test-utils.ts"],
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = TEST_DEPS + [d for d in VITEST_DEPS if d not in TEST_DEPS],
+)
+
+vitest_runner(
     name = "unit_test",
     srcs = SRCS + TESTS + ["tests/test-utils.ts"],
     no_copy_to_bin = [

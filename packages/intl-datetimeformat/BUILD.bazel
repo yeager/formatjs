@@ -11,7 +11,7 @@ load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//tools:index.bzl", "generate_ide_tsconfig_json", "generate_src_file", "ts_run_binary")
 load("//tools:oxc_transpiler.bzl", "oxc_transpiler")
 load("//tools:tsconfig.bzl", "BASE_TSCONFIG")
-load("//tools:vitest.bzl", "vitest")
+load("//tools:vitest.bzl", "TEST_TSCONFIG", "VITEST_DEPS", "vitest_runner")
 load(":defs.bzl", "ZONES")
 load(":index.bzl", "generate_dockerfile")
 
@@ -111,7 +111,20 @@ js_library(
     ],
 )
 
-vitest(
+ts_project(
+    # Type-check only (tsgo, no emit)
+    name = "unit_test_typecheck",
+    testonly = True,
+    srcs = SRCS + TESTS + TEST_LOCALE_DATA,
+    declaration = True,
+    no_emit = True,
+    resolve_json_module = True,
+    transpiler = tsgo_bin.tsgo,
+    tsconfig = TEST_TSCONFIG,
+    deps = TEST_DEPS + [d for d in VITEST_DEPS if d not in TEST_DEPS],
+)
+
+vitest_runner(
     name = "unit_test",
     srcs = SRCS + TESTS + TEST_LOCALE_DATA,
     deps = TEST_DEPS,
