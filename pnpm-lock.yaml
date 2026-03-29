@@ -367,8 +367,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       typesense:
-        specifier: 3.0.3
-        version: 3.0.3(@babel/runtime@7.29.2)
+        specifier: 3.0.4
+        version: 3.0.4(@babel/runtime@7.29.2)
       unidiff:
         specifier: ^1.0.4
         version: 1.0.4
@@ -8155,8 +8155,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typesense@3.0.3:
-    resolution: {integrity: sha512-Cue72Hbz0Aj7DMNXzHIuitBKHWK12GprIFC/7AQ8kR73vJ4iNaKz4eUPICJmQOdWhblEeBv8Am4f9wqEDFd66A==}
+  typesense@3.0.4:
+    resolution: {integrity: sha512-/9ZmyH7mbSnyqkGRmrGkq6uVqFW4C9N+eILYGlpjE6wjhZh750cAG4TOTgDWYoBYmh/BK8qaW4tbf2Dt/WSgAQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@babel/runtime': ^7.23.2
@@ -16726,7 +16726,7 @@ snapshots:
 
   typescript@6.0.2: {}
 
-  typesense@3.0.3(@babel/runtime@7.29.2):
+  typesense@3.0.4(@babel/runtime@7.29.2):
     dependencies:
       '@babel/runtime': 7.29.2
       axios: 1.13.6
