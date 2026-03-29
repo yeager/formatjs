@@ -96,11 +96,13 @@ Currently dead code — the actual test logic is commented out. Only does `copy_
 - ~~Remove `package_json_test` (dead code — test body is commented out)~~ Done (28 BUILD files)
 - `copy_to_bin(name = "package", ...)` was only created inside the macro, nothing external depended on it — removed with the macro call
 
-### Phase 2: Decompose `ts_compile` into stock rules
+### Phase 2: Decompose `ts_compile` into stock rules (**DONE**)
 
 **Effort:** Medium | **Risk:** Medium
 
-Replace each `ts_compile(name = "dist", srcs, deps)` with explicit targets:
+Replaced all `ts_compile` (21 packages) and `ts_compile_node` (7 packages) calls with explicit inline targets. Each macro expanded to 3 targets: ts_project (typecheck), ts_project (transpile), js_library (bundle).
+
+Example expansion:
 
 ```python
 # Gazelle manages deps on this target
