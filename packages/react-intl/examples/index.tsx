@@ -8,6 +8,7 @@ import Injected from './Injected'
 import Messages from './Messages'
 import StaticTypeSafetyAndCodeSplitting from './StaticTypeSafetyAndCodeSplitting/StaticTypeSafetyAndCodeSplitting'
 import Timezone from './TimeZone'
+import SvenskaExample from "./SvenskaExample"
 //polyfills
 import '@formatjs/intl-getcanonicallocales/polyfill.js'
 import '@formatjs/intl-locale/polyfill.js'
